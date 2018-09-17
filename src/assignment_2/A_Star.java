@@ -6,7 +6,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
 import assignment_2.Node.NodeType;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 
 /**
  * 
@@ -20,9 +28,18 @@ public class A_Star {
 	private Node start_node, goal_node;
 	
 	public void run() throws IOException {
-		this.nodes = readFile("./boards/board-1-1.txt");
+		String boardname = "board-2-1";
+		this.nodes = readFile("./boards/" + boardname + ".txt");
 		estimatedCosts();
-		printNodes();
+		Image image = printImage(nodes);
+		image = resample(image);
+		try {
+			File file = new File("./solutions/" + boardname + ".png");
+			file.createNewFile();
+			ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		
 	}
 	
@@ -127,6 +144,87 @@ public class A_Star {
 		}
 	    int scale = (int) Math.pow(10, precision);
 	    return (double) Math.round(value * scale) / scale;
+	}
+	
+	/**
+	 * Prints image based on node list. One pixel per node.
+	 * 
+	 * @param nodes
+	 * @return
+	 */
+	private Image printImage(ArrayList<ArrayList<Node>> nodes) {
+		WritableImage wi = new WritableImage(nodes.get(0).size(), nodes.size());
+		PixelWriter pw = wi.getPixelWriter();
+		
+		// Colors Part 1
+		Color open_color = new Color(255d/255, 255d/255, 255d/255, 1.0);
+		Color block_color = new Color(0d/255, 0d/255, 0d/255, 1.0);
+		Color start_color = new Color(225d/255, 0d/255, 0d/255, 1.0);
+		Color goal_color = new Color(127d/255, 255d/255, 0d/255, 1.0);
+		
+		// Colors Part 2
+		Color water_color = new Color(0d/255, 0d/255, 200d/255, 1.0);
+		Color mountain_color = new Color(100d/255, 100d/255, 100d/255, 1.0);
+		Color forest_color = new Color(34d/255, 139d/255, 34d/255, 1.0);
+		Color grass_color = new Color(144d/255, 238d/255, 144d/255, 1.0);
+		Color road_color = new Color(205d/255, 133d/255, 63d/255, 1.0);
+		
+		for(ArrayList<Node> node_row : nodes) {
+			for(Node node : node_row) {
+				if(node.getNodeType() == NodeType.OPEN) {
+					pw.setColor(node.getXCord(), node.getYCord(), open_color);
+				} else if(node.getNodeType() == NodeType.BLOCK) {
+					pw.setColor(node.getXCord(), node.getYCord(), block_color);
+				} else if(node.getNodeType() == NodeType.START) {
+					pw.setColor(node.getXCord(), node.getYCord(), start_color);
+				} else if(node.getNodeType() == NodeType.GOAL) {
+					pw.setColor(node.getXCord(), node.getYCord(), goal_color);
+				} else if(node.getNodeType() == NodeType.WATER) {
+					pw.setColor(node.getXCord(), node.getYCord(), water_color);
+				} else if(node.getNodeType() == NodeType.MOUNTAIN) {
+					pw.setColor(node.getXCord(), node.getYCord(), mountain_color);
+				} else if(node.getNodeType() == NodeType.FOREST) {
+					pw.setColor(node.getXCord(), node.getYCord(), forest_color);
+				} else if(node.getNodeType() == NodeType.GRASSLAND) {
+					pw.setColor(node.getXCord(), node.getYCord(), grass_color);
+				} else if(node.getNodeType() == NodeType.ROAD) {
+					pw.setColor(node.getXCord(), node.getYCord(), road_color);
+				} 
+			}
+		}
+		
+		return wi;
+		
+	}
+	
+	/**
+	 * Resamples a given image
+	 * 
+	 * @param input
+	 * @return
+	 */
+	private Image resample(Image input) {
+		final int W = (int) input.getWidth();
+		final int H = (int) input.getHeight();
+		final double S = Math.min(750d / (double) W, 750d / (double) H);
+
+		WritableImage output = new WritableImage((int) (W * S) + 1, (int) (H * S) + 1);
+
+		PixelReader reader = input.getPixelReader();
+		PixelWriter writer = output.getPixelWriter();
+
+		for (int y = 0; y < H; y++) {
+			for (int x = 0; x < W; x++) {
+				final int argb = reader.getArgb(x, y);
+				for (int dy = 0; dy < S; dy++) {
+					for (int dx = 0; dx < S; dx++) {
+						writer.setArgb((int) (x * S + dx), (int) (y * S + dy), argb);
+					}
+				}
+			}
+		}
+
+		return output;
 	}
 	
 	private void printNodes() {
