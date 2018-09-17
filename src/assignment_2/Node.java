@@ -8,6 +8,9 @@ package assignment_2;
 
 public class Node {
 	
+	/**
+	 * Enumerative Datatype to keep track of all the nodetypes
+	 */
 	enum NodeType {
 		// Part 1
 		START,
