@@ -6,6 +6,11 @@ package assignment_2;
  *
  */
 
+/**
+ * 
+ * This class represents a single node in the maze
+ *
+ */
 public class Node {
 	
 	/**
@@ -42,37 +47,58 @@ public class Node {
 		this.x_cord = x_cord;
 		this.y_cord = y_cord;
 		
-		if(nodetype == 'A') {
-			this.nodetype = NodeType.START;
-			this.node_cost = 0;
-		} else if (nodetype == 'B') {
-			this.nodetype = NodeType.GOAL;
-			this.node_cost = 0;
-		} else if (nodetype == '.') {
-			this.nodetype = NodeType.OPEN;
-			this.node_cost = 1;
-		} else if (nodetype == '#') {
-			this.nodetype = NodeType.BLOCK;
-			this.node_cost = null;
-		} else if(nodetype == 'w') {
-			this.nodetype = NodeType.WATER;
-			this.node_cost = 100;
-		} else if(nodetype == 'm') {
-			this.nodetype = NodeType.MOUNTAIN;
-			this.node_cost = 50;
-		} else if(nodetype == 'f') {
-			this.nodetype = NodeType.FOREST;
-			this.node_cost = 10;
-		} else if(nodetype == 'g') {
-			this.nodetype = NodeType.GRASSLAND;
-			this.node_cost = 5;
-		} else if(nodetype == 'r') {
-			this.nodetype = NodeType.ROAD;
-			this.node_cost = 1;
-		} else {
-			throw new IllegalArgumentException("Incorrect nodetype");
+		switch(nodetype) {
+			case 'A':
+				this.nodetype = NodeType.START;
+				this.node_cost = 0;
+				break;
+			case 'B':
+				this.nodetype = NodeType.GOAL;
+				this.node_cost = 0;
+				break;
+			
+			// Part 1
+			case '.':
+				this.nodetype = NodeType.OPEN;
+				this.node_cost = 1;
+				break;
+			case '#':
+				this.nodetype = NodeType.BLOCK;
+				this.node_cost = null;
+				break;
+			
+			// Part 2
+			case 'w':
+				this.nodetype = NodeType.WATER;
+				this.node_cost = 100;
+				break;
+			case 'm':
+				this.nodetype = NodeType.MOUNTAIN;
+				this.node_cost = 50;
+				break;
+			case 'f':
+				this.nodetype = NodeType.FOREST;
+				this.node_cost = 10;
+				break;
+			case 'g':
+				this.nodetype = NodeType.GRASSLAND;
+				this.node_cost = 5;
+				break;
+			case 'r':
+				this.nodetype = NodeType.ROAD;
+				this.node_cost = 1;
+				break;
+			default:
+				throw new IllegalArgumentException("Incorrect nodetype");
 		}
+
 	}
+	
+	/**
+	 * 
+	 * Setters and getters for the Node objects
+	 * 
+	 */
 	
 	public void setParent(Node node) {
 		this.parent = node;

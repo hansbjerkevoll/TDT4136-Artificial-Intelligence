@@ -24,6 +24,7 @@ public class MazeSolver {
 	private String root = "./src/assignment_2/";
 	
 	/**
+	 * Runs the MazeSolving algorithms on all the mazes in the folder "boards"
 	 * 
 	 * @throws IOException
 	 */
@@ -37,14 +38,13 @@ public class MazeSolver {
 			this.nodes = readFile(file);
 			estimatedCosts();
 			
-			ArrayList<Node> solution = new SearchAlgorithms().AStarSearch(start_node, nodes);
+			ArrayList<Node> solution = new SearchAlgorithms().DepthFirstSearch(start_node, nodes);
 			Image image = ImageProcessing.createSolutionImage(nodes, solution);
-			File img_file = new File(root + "solutions/" + file.getName().replaceAll(".txt", "") + ".png");
+			File img_file = new File(root + "solutions/Depth-First Search/" + file.getName().replaceAll(".txt", "") + ".png");
 			file.createNewFile();
 			ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", img_file);
 		}
-		
-		
+			
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public class MazeSolver {
 	private void estimatedCosts() {
 		for(ArrayList<Node> node_row : nodes) {
 			for(Node node : node_row) {
-				manhattanHeuristic(node, goal_node);
+				//manhattanHeuristic(node, goal_node);
 				euclidianHeuristic(node, goal_node);
 			}
 		}

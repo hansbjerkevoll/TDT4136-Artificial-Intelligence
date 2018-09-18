@@ -173,13 +173,15 @@ public class SearchAlgorithms {
 	}
 	
 	/** 
-	 * Searches the list of nodes, using Breadth First Search
+	 * Searches the list of nodes, using Depth First Search
+	 * (implemented dfs to demonstrate the differences between bfs and dfs)
+	 * (solutions to dfs can be found in separate folder)
 	 * 
 	 * @param start
 	 * @param nodes
 	 * @return a list of nodes containing the solution
 	 */
-	public ArrayList<Node> BreadthFirstSearch(Node start, ArrayList<ArrayList<Node>> nodes){
+	public ArrayList<Node> DepthFirstSearch(Node start, ArrayList<ArrayList<Node>> nodes){
 		// Nodes already evaluated
 		ArrayList<Node> closed = new ArrayList<>();
 		// Discovered nodes not evaluated
@@ -243,18 +245,16 @@ public class SearchAlgorithms {
 		
 		return solution;
 	}
-	
-	
+		
+
 	/** 
-	 * Searches the list of nodes, using Depth First Search
-	 * (implemented dfs to demonstrate the differences between bfs and dfs)
-	 * (solutions to dfs can be found in separate folder)
+	 * Searches the list of nodes, using Breadth First Search
 	 * 
 	 * @param start
 	 * @param nodes
 	 * @return a list of nodes containing the solution
 	 */
-	public ArrayList<Node> DepthFirstSearch(Node start, ArrayList<ArrayList<Node>> nodes){
+	public ArrayList<Node> BreadthFirstSearch(Node start, ArrayList<ArrayList<Node>> nodes){
 		// Nodes already evaluated
 		ArrayList<Node> closed = new ArrayList<>();
 		// Discovered nodes not evaluated
