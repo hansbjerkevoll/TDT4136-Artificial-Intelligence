@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import javax.imageio.ImageIO;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -32,40 +35,54 @@ public class AStar {
 	 * @throws IOException
 	 */
 	public void run() throws IOException {
-		String boardname = "board-2-3";
+		String boardname = "board-2-2";
 		this.nodes = readFile(root + "boards/" + boardname + ".txt");
 		estimatedCosts();
-		Image image = ImageProcessing.printImage(nodes);
 		
-		// START PRINT TESTING
-		Node test = new Node(0, 3, '.');
-		Node test1 = new Node(1, 3, '.');
-		Node test2 = new Node(2, 3, '.');
-		Node test3 = new Node(2, 2, '.');
-		Node test4 = new Node(3, 2, '.');
-		Node test5 = new Node(3, 1, '.');
-		Node test6 = new Node(3, 0, '.');
-		Node test7 = new Node(4, 0, '.');
-		Node test8 = new Node(5, 0, '.');
+		// START NEIGHBOUR TESTING
+		ArrayList<Node> start_neighbours = getNeighbour(start_node);
+		System.out.println("Start: " + start_node.getXCord() + " " + start_node.getYCord());
+		for(Node node : start_neighbours) {
+			System.out.println(node.getXCord() + " " + node.getYCord() + ", est " + node.getEstCost());
+		}
 		
-		ArrayList<Node> solution = new ArrayList<>();
-//		solution.add(test);
-//		solution.add(test1);
-//		solution.add(test2);
-//		solution.add(test3);
-//		solution.add(test4);
-//		solution.add(test5);
-//		solution.add(test6);
-//		solution.add(test7);
-//		solution.add(test8);
 		
 		// END TESTING
-		
-		image = ImageProcessing.resample(image, solution);
+		ArrayList<Node> solution = new ArrayList<>();
+		Image image = ImageProcessing.createSolutionImage(nodes, solution);
 		File file = new File(root + "solutions/" + boardname + ".png");
 		file.createNewFile();
 		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
 	}
+	
+	
+	private ArrayList<Node> getNeighbour(Node node){
+		
+		ArrayList<Node> neighbours = new ArrayList<>();
+		
+		if(node.getXCord() > 0) {
+			neighbours.add(nodes.get(node.getYCord()).get(node.getXCord() - 1));
+		}
+		
+		if(node.getYCord() > 0) {
+			neighbours.add(nodes.get(node.getYCord() - 1).get(node.getXCord()));
+		}
+		
+		if(node.getXCord() < nodes.get(0).size() - 1) {
+			neighbours.add(nodes.get(node.getYCord()).get(node.getXCord() + 1));
+		}
+		
+		if(node.getYCord() < nodes.size() - 1) {
+			neighbours.add(nodes.get(node.getYCord() + 1).get(node.getXCord()));
+		}
+		
+		Collections.sort(neighbours, (node1, node2) -> node1.getEstCost() < node2.getEstCost() ? -1 : node1.getEstCost() == node2.getEstCost() ? 0 : 1);
+		
+		return neighbours;
+		
+	}
+	
+	
 	
 	/**
 	 * Update the estimated cost for all the nodes

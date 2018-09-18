@@ -11,12 +11,24 @@ import javafx.scene.paint.Color;
 public class ImageProcessing {
 	
 	/**
+	 * Creates an image that respresents the map and visulizes the solution
+	 * 
+	 * @param nodes
+	 * @param solution
+	 * @return An full hd image visualizing the map and the solution
+	 */
+	public static Image createSolutionImage(ArrayList<ArrayList<Node>> nodes, ArrayList<Node> solution) {
+		Image node_img = createNodeImage(nodes);
+		return resample(node_img, solution);
+	}
+	
+	/**
 	 * Creates an image object based on node list. One pixel per node.
 	 * 
 	 * @param nodes
 	 * @return An Image object with one pixel per node in the correct color
 	 */
-	public static Image printImage(ArrayList<ArrayList<Node>> nodes) {
+	private static Image createNodeImage(ArrayList<ArrayList<Node>> nodes) {
 		WritableImage wi = new WritableImage(nodes.get(0).size(), nodes.size());
 		PixelWriter pw = wi.getPixelWriter();
 		
@@ -93,7 +105,7 @@ public class ImageProcessing {
 	 * @param The image to be resampled
 	 * @return The resampled image 
 	 */
-	public static Image resample(Image input, ArrayList<Node> solution) {
+	private static Image resample(Image input, ArrayList<Node> solution) {
 		final int W = (int) input.getWidth();
 		final int H = (int) input.getHeight();
 		final double S = Math.min(1920d / (double) W, 1080d / (double) H);
