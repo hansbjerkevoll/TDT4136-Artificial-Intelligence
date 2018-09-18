@@ -16,7 +16,7 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		A_Star a_star = new A_Star();
+		AStar a_star = new AStar();
 		a_star.run();
 	}
 	

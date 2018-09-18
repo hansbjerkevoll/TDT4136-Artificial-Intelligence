@@ -20,18 +20,20 @@ import javafx.scene.paint.Color;
  *
  */
 
-public class A_Star {
+public class AStar {
 	
 	private ArrayList<ArrayList<Node>> nodes;
 	private Node start_node, goal_node;
+	
+	private String root = "./src/assignment_2/";
 	
 	/**
 	 * 
 	 * @throws IOException
 	 */
 	public void run() throws IOException {
-		String boardname = "board-2-4";
-		this.nodes = readFile("./boards/" + boardname + ".txt");
+		String boardname = "board-2-3";
+		this.nodes = readFile(root + "boards/" + boardname + ".txt");
 		estimatedCosts();
 		Image image = ImageProcessing.printImage(nodes);
 		
@@ -47,20 +49,20 @@ public class A_Star {
 		Node test8 = new Node(5, 0, '.');
 		
 		ArrayList<Node> solution = new ArrayList<>();
-		solution.add(test);
-		solution.add(test1);
-		solution.add(test2);
-		solution.add(test3);
-		solution.add(test4);
-		solution.add(test5);
-		solution.add(test6);
-		solution.add(test7);
-		solution.add(test8);
+//		solution.add(test);
+//		solution.add(test1);
+//		solution.add(test2);
+//		solution.add(test3);
+//		solution.add(test4);
+//		solution.add(test5);
+//		solution.add(test6);
+//		solution.add(test7);
+//		solution.add(test8);
 		
 		// END TESTING
 		
 		image = ImageProcessing.resample(image, solution);
-		File file = new File("./solutions/" + boardname + ".png");
+		File file = new File(root + "solutions/" + boardname + ".png");
 		file.createNewFile();
 		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
 	}
