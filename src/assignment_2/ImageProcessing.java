@@ -135,7 +135,7 @@ public class ImageProcessing {
 							writer.setArgb((int) (x * S + dx), (int) (y * S + dy), -16777216);	
 						} 
 						// Print a dot in the middle, if node is in solution
-						else if(print_dot && (dx < ( S/2 + 3) && dx > ( S/2 - 3) && dy < ( S/2 + 3) && dy > ( S/2 - 3))) {
+						else if(print_dot && (dx < ( S/2 + 4) && dx > ( S/2 - 4) && dy < ( S/2 + 4) && dy > ( S/2 - 4))) {
 							writer.setArgb((int) (x * S + dx), (int) (y * S + dy), -16777216);	
 						}
 						// Print the color of the node

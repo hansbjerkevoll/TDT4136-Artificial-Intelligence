@@ -29,9 +29,11 @@ public class Node {
 	
 	private NodeType nodetype;
 	
-	private int distance;
+	private Node parent;
+	
+	private double distance = Double.POSITIVE_INFINITY;
 	private double est_cost;
-	private int node_cost;
+	private Integer node_cost;
 	
 	private int x_cord, y_cord;
 	
@@ -42,16 +44,16 @@ public class Node {
 		
 		if(nodetype == 'A') {
 			this.nodetype = NodeType.START;
-			this.node_cost = 1;
+			this.node_cost = 0;
 		} else if (nodetype == 'B') {
 			this.nodetype = NodeType.GOAL;
-			this.node_cost = 1;
+			this.node_cost = 0;
 		} else if (nodetype == '.') {
 			this.nodetype = NodeType.OPEN;
 			this.node_cost = 1;
 		} else if (nodetype == '#') {
 			this.nodetype = NodeType.BLOCK;
-			this.node_cost = Integer.MAX_VALUE;
+			this.node_cost = null;
 		} else if(nodetype == 'w') {
 			this.nodetype = NodeType.WATER;
 			this.node_cost = 100;
@@ -72,6 +74,14 @@ public class Node {
 		}
 	}
 	
+	public void setParent(Node node) {
+		this.parent = node;
+	}
+	
+	public Node getParent() {
+		return this.parent;
+	}
+	
 	public int getXCord() {
 		return this.x_cord;
 	}
@@ -84,15 +94,15 @@ public class Node {
 		return this.nodetype;
 	}
 	
-	public int getPathCost(){
+	public double getNodeCost(){
 		return this.node_cost;
 	}
 	
-	public void setDistance(int distance) {
+	public void setDistance(double distance) {
 		this.distance = distance;
 	}
 	
-	public int getDistance() {
+	public double getDistance() {
 		return this.distance;
 	}
 	
@@ -102,6 +112,10 @@ public class Node {
 	
 	public double getEstCost() {
 		return this.est_cost;
+	}
+	
+	public Double getTotalExpectedCost() {
+		return est_cost + distance;
 	}
 
 }

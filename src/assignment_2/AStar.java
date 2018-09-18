@@ -6,16 +6,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
 import javax.imageio.ImageIO;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
 
 /**
  * 
@@ -35,54 +28,24 @@ public class AStar {
 	 * @throws IOException
 	 */
 	public void run() throws IOException {
-		String boardname = "board-2-2";
-		this.nodes = readFile(root + "boards/" + boardname + ".txt");
-		estimatedCosts();
 		
-		// START NEIGHBOUR TESTING
-		ArrayList<Node> start_neighbours = getNeighbour(start_node);
-		System.out.println("Start: " + start_node.getXCord() + " " + start_node.getYCord());
-		for(Node node : start_neighbours) {
-			System.out.println(node.getXCord() + " " + node.getYCord() + ", est " + node.getEstCost());
+		File board_folder = new File(root + "boards");
+		File[] board_list = board_folder.listFiles();
+		
+		// Solve all the boards in the boards folder
+		for(File file : board_list) {
+			this.nodes = readFile(file);
+			estimatedCosts();
+			
+			ArrayList<Node> solution = new SearchAlgorithms().AStarSearch(start_node, nodes);
+			Image image = ImageProcessing.createSolutionImage(nodes, solution);
+			File img_file = new File(root + "solutions/" + file.getName().replaceAll(".txt", "") + ".png");
+			file.createNewFile();
+			ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", img_file);
 		}
 		
-		
-		// END TESTING
-		ArrayList<Node> solution = new ArrayList<>();
-		Image image = ImageProcessing.createSolutionImage(nodes, solution);
-		File file = new File(root + "solutions/" + boardname + ".png");
-		file.createNewFile();
-		ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-	}
-	
-	
-	private ArrayList<Node> getNeighbour(Node node){
-		
-		ArrayList<Node> neighbours = new ArrayList<>();
-		
-		if(node.getXCord() > 0) {
-			neighbours.add(nodes.get(node.getYCord()).get(node.getXCord() - 1));
-		}
-		
-		if(node.getYCord() > 0) {
-			neighbours.add(nodes.get(node.getYCord() - 1).get(node.getXCord()));
-		}
-		
-		if(node.getXCord() < nodes.get(0).size() - 1) {
-			neighbours.add(nodes.get(node.getYCord()).get(node.getXCord() + 1));
-		}
-		
-		if(node.getYCord() < nodes.size() - 1) {
-			neighbours.add(nodes.get(node.getYCord() + 1).get(node.getXCord()));
-		}
-		
-		Collections.sort(neighbours, (node1, node2) -> node1.getEstCost() < node2.getEstCost() ? -1 : node1.getEstCost() == node2.getEstCost() ? 0 : 1);
-		
-		return neighbours;
 		
 	}
-	
-	
 	
 	/**
 	 * Update the estimated cost for all the nodes
@@ -135,11 +98,10 @@ public class AStar {
 	 * @param filepath
 	 * @throws IOException
 	 */
-	private ArrayList<ArrayList<Node>> readFile(String filepath) throws IOException {
+	private ArrayList<ArrayList<Node>> readFile(File file) throws IOException {
 		
 		ArrayList<ArrayList<Node>> nodes = new ArrayList<>();
 		
-		File file = new File(filepath);
 		BufferedReader br = new BufferedReader(new FileReader(file));
 		
 		String board_row;
@@ -152,6 +114,7 @@ public class AStar {
 				Node node = new Node(x_cord, y_cord, c);
 				node_list.add(node);
 				if(node.getNodeType() == NodeType.START) {
+					node.setDistance(0);
 					start_node = node;
 				}
 				if(node.getNodeType() == NodeType.GOAL) {
