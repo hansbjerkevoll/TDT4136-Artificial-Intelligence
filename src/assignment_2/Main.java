@@ -16,7 +16,7 @@ public class Main {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		AStar a_star = new AStar();
+		MazeSolver a_star = new MazeSolver();
 		a_star.run();
 	}
 	

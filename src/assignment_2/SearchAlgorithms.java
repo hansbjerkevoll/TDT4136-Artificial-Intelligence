@@ -7,6 +7,11 @@ import java.util.Stack;
 
 import assignment_2.Node.NodeType;
 
+/**
+ * 
+ * @author Hans Bjerkevoll
+ *
+ */
 public class SearchAlgorithms {
 	
 	/** 

@@ -16,7 +16,7 @@ import javafx.scene.image.Image;
  *
  */
 
-public class AStar {
+public class MazeSolver {
 	
 	private ArrayList<ArrayList<Node>> nodes;
 	private Node start_node, goal_node;
