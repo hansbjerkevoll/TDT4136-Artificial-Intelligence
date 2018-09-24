@@ -14,6 +14,17 @@ import assignment_2.Node.NodeType;
  */
 public class SearchAlgorithms {
 	
+	private ArrayList<ArrayList<Node>> nodes;
+	private Node start;
+	
+	private ArrayList<Node> open;
+	private ArrayList<Node> closed;
+	
+	public SearchAlgorithms(Node start, ArrayList<ArrayList<Node>> nodes) {
+		this.nodes = nodes;
+		this.start = start;
+	}
+	
 	/** 
 	 * Searches the list of nodes, using A* search
 	 * 
@@ -21,7 +32,7 @@ public class SearchAlgorithms {
 	 * @param nodes
 	 * @return a list of nodes containing the solution
 	 */
-	public ArrayList<Node> AStarSearch(Node start, ArrayList<ArrayList<Node>> nodes) {
+	public ArrayList<Node> AStarSearch() {
 		
 		// Nodes already evaluated
 		ArrayList<Node> closed = new ArrayList<>();
@@ -87,7 +98,8 @@ public class SearchAlgorithms {
 			}
 		}
 		
-
+		this.open = open;
+		this.closed = closed;
 		ArrayList<Node> solution = reconstruct_solution(goal_node);
 			
 		return solution;
@@ -101,7 +113,7 @@ public class SearchAlgorithms {
 	 * @param nodes
 	 * @return a list of nodes containing the solution
 	 */
-	public ArrayList<Node> DijkstraSearch(Node start, ArrayList<ArrayList<Node>> nodes){
+	public ArrayList<Node> DijkstraSearch(){
 		// Nodes already evaluated
 		ArrayList<Node> closed = new ArrayList<>();
 		// Discovered nodes not evaluated
@@ -165,7 +177,8 @@ public class SearchAlgorithms {
 			}
 		}
 		
-
+		this.open = open;
+		this.closed = closed;
 		ArrayList<Node> solution = reconstruct_solution(goal_node);
 		
 		
@@ -181,7 +194,7 @@ public class SearchAlgorithms {
 	 * @param nodes
 	 * @return a list of nodes containing the solution
 	 */
-	public ArrayList<Node> DepthFirstSearch(Node start, ArrayList<ArrayList<Node>> nodes){
+	public ArrayList<Node> DepthFirstSearch(){
 		// Nodes already evaluated
 		ArrayList<Node> closed = new ArrayList<>();
 		// Discovered nodes not evaluated
@@ -242,7 +255,8 @@ public class SearchAlgorithms {
 
 		ArrayList<Node> solution = reconstruct_solution(goal_node);
 		
-		
+		this.open = new ArrayList<Node>(open);
+		this.closed = closed;
 		return solution;
 	}
 		
@@ -254,7 +268,7 @@ public class SearchAlgorithms {
 	 * @param nodes
 	 * @return a list of nodes containing the solution
 	 */
-	public ArrayList<Node> BreadthFirstSearch(Node start, ArrayList<ArrayList<Node>> nodes){
+	public ArrayList<Node> BreadthFirstSearch(){
 		// Nodes already evaluated
 		ArrayList<Node> closed = new ArrayList<>();
 		// Discovered nodes not evaluated
@@ -312,7 +326,8 @@ public class SearchAlgorithms {
 			}
 		}
 		
-
+		this.open = new ArrayList<Node>(open);
+		this.closed = closed;
 		ArrayList<Node> solution = reconstruct_solution(goal_node);
 		
 		
@@ -375,4 +390,11 @@ public class SearchAlgorithms {
 		
 	}
 
+	
+	public ArrayList<Node> getOpenNodes(){
+		return this.open;
+	}
+	public ArrayList<Node> getClosedNodes(){
+		return this.closed;
+	}
 }
