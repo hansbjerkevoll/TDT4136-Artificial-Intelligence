@@ -60,7 +60,6 @@ public class AppController {
 		
 		// Show or hide estimate choice
 		alg_choicebox.getSelectionModel().selectedItemProperty().addListener((obs, oldv, newv) -> {
-			System.out.println(newv);
 			est_label.setVisible("A* (A-Star)".equals(newv));
 			est_choicebox.setVisible("A* (A-Star)".equals(newv));			
 		});
