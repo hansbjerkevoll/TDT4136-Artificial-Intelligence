@@ -13,6 +13,13 @@ import assignment_2.Node.NodeType;
  *
  */
 
+
+/**
+ * 
+ * Search Algorithms for searhcing a given board, with a given start node.
+ * All algorithms are written by myself from scratch, based on the pseudocode provided
+ *
+ */
 public class SearchAlgorithms {
 	
 	private ArrayList<ArrayList<Node>> nodes;
