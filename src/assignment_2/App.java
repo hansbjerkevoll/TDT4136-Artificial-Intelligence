@@ -15,8 +15,6 @@ import javafx.stage.Stage;
 /**
  * This is the main class for the program, and the start application
  */
-
-
 public class App extends Application {
 	
 	public static void main(String[] args) {

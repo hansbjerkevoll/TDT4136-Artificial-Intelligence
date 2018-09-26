@@ -8,7 +8,7 @@ package assignment_2;
 
 /**
  * 
- * This class represents a single node in the maze
+ * A node object represents a single node in the maze
  *
  */
 public class Node {

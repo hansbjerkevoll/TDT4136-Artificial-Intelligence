@@ -12,6 +12,7 @@ import assignment_2.Node.NodeType;
  * @author Hans Bjerkevoll
  *
  */
+
 public class SearchAlgorithms {
 	
 	private ArrayList<ArrayList<Node>> nodes;
@@ -390,6 +391,10 @@ public class SearchAlgorithms {
 		
 	}
 
+	/**
+	 * Getters for open and closed nodes. Used to print on board
+	 * @return List of nodes, either open or closed
+	 */
 	
 	public ArrayList<Node> getOpenNodes(){
 		return this.open;

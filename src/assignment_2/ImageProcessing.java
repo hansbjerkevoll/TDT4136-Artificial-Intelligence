@@ -18,9 +18,6 @@ import javafx.scene.paint.Color;
  * 
  * This class contains all the functions used to turn a list of nodes into a solved board
  * 
- * Please note that this solution is horrible, ineffective and difficult to work with.
- * A much better solution would be to use Java SVG. But i couldn't be bothered to change it.
- *
  */
 public class ImageProcessing {
 	

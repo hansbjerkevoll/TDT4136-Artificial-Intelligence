@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -26,6 +25,11 @@ import javafx.stage.FileChooser.ExtensionFilter;
  *
  */
 
+/**
+ * 
+ * Controller class for the JavaFX application
+ *
+ */
 public class AppController {
 	
 	/**
@@ -89,7 +93,7 @@ public class AppController {
 			}
 		});
 		
-		// Solve loaded board on solve click
+		// Solve loaded board on solve button click
 		solve_button.setOnAction(e -> {
 			
 			// If board not loaded => do nothing
@@ -97,29 +101,8 @@ public class AppController {
 				return;
 			}
 			
-			estimatedCosts();
+			solveBoard(loaded_board);		
 			
-			SearchAlgorithms search = new SearchAlgorithms(start_node, nodes);
-						
-			ArrayList<Node> solution = null;
-			
-			// Get selected algorithm
-			if(alg_choicebox.getValue().equals("A* (A-Star)")) {
-				solution = search.AStarSearch();
-			} else if (alg_choicebox.getValue().equals("Dijkstra")) {
-				solution = search.DijkstraSearch();
-			} else if (alg_choicebox.getValue().equals("BFS")) {
-				solution = search.BreadthFirstSearch();
-			} else if (alg_choicebox.getValue().equals("DFS")) {
-				solution = search.DepthFirstSearch();
-			}
-			
-			solution = solution_check.isSelected() ? solution : null;
-			ArrayList<Node> open = open_check.isSelected() ? search.getOpenNodes() : null;
-			ArrayList<Node> closed = closed_check.isSelected() ? search.getClosedNodes() : null;
-			
-			Image image = ImageProcessing.createSolutionImage(nodes, solution, open, closed);
-			imageview.setImage(image);
 		});
 		
 	}
@@ -211,6 +194,39 @@ public class AppController {
 		br.close();
 		
 		return nodes;
+		
+	}
+	
+	/**
+	 * Solves and display a given board file
+	 * 
+	 * @param loaded_board
+	 */
+	public void solveBoard(File loaded_board) {
+		estimatedCosts();
+		
+		SearchAlgorithms search = new SearchAlgorithms(start_node, nodes);
+					
+		ArrayList<Node> solution = null;
+		
+		// Get selected algorithm
+		if(alg_choicebox.getValue().equals("A* (A-Star)")) {
+			solution = search.AStarSearch();
+		} else if (alg_choicebox.getValue().equals("Dijkstra")) {
+			solution = search.DijkstraSearch();
+		} else if (alg_choicebox.getValue().equals("BFS")) {
+			solution = search.BreadthFirstSearch();
+		} else if (alg_choicebox.getValue().equals("DFS")) {
+			solution = search.DepthFirstSearch();
+		}
+		
+		solution = solution_check.isSelected() ? solution : null;
+		ArrayList<Node> open = open_check.isSelected() ? search.getOpenNodes() : null;
+		ArrayList<Node> closed = closed_check.isSelected() ? search.getClosedNodes() : null;
+		
+		Image image = ImageProcessing.createSolutionImage(nodes, solution, open, closed);
+		imageview.setImage(image);
+		
 		
 	}
 	
