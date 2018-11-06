@@ -15,22 +15,8 @@ public class Assignment5 {
 	public static void main(String[] args) throws IOException {
 	
 		CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
-		System.out.println(csp.constraints.get("1-0"));
-	}
-	
-	public static interface ValuePairFilter {
-		public boolean filter(String x, String y);
-	}
-
-	public static class DifferentValuesFilter implements ValuePairFilter {
-		@Override
-		public boolean filter(String x, String y) {
-			return !x.equals(y);
-		}
-	}
-
-	@SuppressWarnings("serial")
-	public static class VariablesToDomainsMapping extends HashMap<String, ArrayList<String>> {
+		
+		
 	}
 
 	public static class CSP {
@@ -86,7 +72,9 @@ public class Assignment5 {
 		 * values has a length greater than one.
 		 */
 		public String selectUnassignedVariable(VariablesToDomainsMapping assignment) {
+			// TODO: IMPLEMENT THIS
 			
+			// PRETTY SURE THIS IS CORRECT
 			Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
 			while(it.hasNext()) {
 				Map.Entry<String, ArrayList<String>> pair = it.next();
@@ -103,8 +91,34 @@ public class Assignment5 {
 		 * arcs that should be visited.
 		 */
 		public boolean inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
+			
 			// TODO: IMPLEMENT THIS
-			return false;
+			
+			while(!queue.isEmpty()) {
+				
+				/**
+				 * Fetch and remove the element in the beginning of the queue
+				 * Why not just use a queue instead of arraylist?
+				 */
+				
+				Pair<String> current = queue.get(0);
+				queue.remove(0);
+				
+				if(revise(assignment, current.x, current.y)) {
+					if(assignment.isEmpty()) {
+						return false;
+					}
+					
+					// HOW DO I DO?!
+					for each Xk in (Xi.neighbors - {Xj}){
+						queue.add((Xk, Xi));
+					}
+					
+				}
+				
+			}
+			
+			return true;
 		}
 
 		/**
@@ -119,10 +133,32 @@ public class Assignment5 {
 		public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
 			// TODO: IMPLEMENT THIS
 			
+			/**
+			 * NO IDEA IF THIS IS ABSOLUTE SHITE
+			 * WILL HAVE TO DEBUG LATER
+			 * LOOKS LIKE SHITE
+			 */
 			
-		
+			boolean revised = false;
 			
-			return false;
+			for(String x : assignment.get(i)) {
+				boolean extension_found = false;
+				for(String y : assignment.get(j)) {
+					for(Pair<String> value : this.constraints.get(i).get(j)) {
+						if(value.x.equals(x) && value.y.equals(y)) {
+							extension_found = true;
+							break;
+						}
+					}
+					
+					if(!extension_found) {
+						assignment.remove(i);
+						revised = true;
+					}				
+				}
+			}
+			
+			return revised;
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -375,5 +411,21 @@ public class Assignment5 {
 				System.out.println("------+-------+------");
 			}
 		}
+	}
+	
+	public static interface ValuePairFilter {
+		public boolean filter(String x, String y);
+	}
+
+	public static class DifferentValuesFilter implements ValuePairFilter {
+		
+		@Override
+		public boolean filter(String x, String y) {
+			return !x.equals(y);
+		}
+	}
+
+	@SuppressWarnings("serial")
+	public static class VariablesToDomainsMapping extends HashMap<String, ArrayList<String>> {
 	}
 }
