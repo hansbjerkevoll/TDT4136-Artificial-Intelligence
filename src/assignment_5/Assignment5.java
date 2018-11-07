@@ -15,8 +15,8 @@ public class Assignment5 {
 	public static void main(String[] args) throws IOException {
 	
 		CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
-		//printSudokuSolution(csp.domains);
-		ArrayList<String> test = new ArrayList<>();
+		printSudokuSolution(csp.domains);
+		System.out.println(csp.getAllNeighboringArcs("1-1"));
 		
 		
 		
@@ -82,7 +82,6 @@ public class Assignment5 {
 		public String selectUnassignedVariable(VariablesToDomainsMapping assignment) {
 			// TODO: IMPLEMENT THIS
 			
-			// PRETTY SURE THIS IS CORRECT
 			Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
 			while(it.hasNext()) {
 				Map.Entry<String, ArrayList<String>> pair = it.next();
@@ -101,7 +100,6 @@ public class Assignment5 {
 		public boolean inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
 			
 			// TODO: IMPLEMENT THIS
-			System.out.println(queue);
 			while(!queue.isEmpty()) {
 				
 				Pair<String> pair = queue.get(0);
@@ -110,6 +108,14 @@ public class Assignment5 {
 				if(revise(assignment, pair.x, pair.y)) {
 					if(assignment.get(pair.x).size() == 0) {
 						return false;
+					}
+					
+					for(Pair<String> neighbour : getAllNeighboringArcs(pair.x)) {
+						if(neighbour.x == pair.y) {
+							continue;
+						}
+						
+						queue.add(neighbour);
 					}
 					
 					
