@@ -15,6 +15,18 @@ public class Assignment5 {
 	public static void main(String[] args) throws IOException {
 	
 		CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
+		printSudokuSolution(csp.domains);
+		
+		System.out.println(csp.revise(csp.domains, "0-0", "1-0"));
+		
+		for(String x : csp.domains.get("0-0")) {
+			System.out.println(x);
+		}
+		
+		
+		
+		//System.out.println(csp.revise(csp.domains, "0-0", "1-0"));
+		//System.out.println(csp.constraints.get("0-2").get("1-0"));	
 		
 		
 	}
@@ -93,31 +105,6 @@ public class Assignment5 {
 		public boolean inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
 			
 			// TODO: IMPLEMENT THIS
-			
-			while(!queue.isEmpty()) {
-				
-				/**
-				 * Fetch and remove the element in the beginning of the queue
-				 * Why not just use a queue instead of arraylist?
-				 */
-				
-				Pair<String> current = queue.get(0);
-				queue.remove(0);
-				
-				if(revise(assignment, current.x, current.y)) {
-					if(assignment.isEmpty()) {
-						return false;
-					}
-					
-					// HOW DO I DO?!
-					for each Xk in (Xi.neighbors - {Xj}){
-						queue.add((Xk, Xi));
-					}
-					
-				}
-				
-			}
-			
 			return true;
 		}
 
@@ -132,34 +119,34 @@ public class Assignment5 {
 		 */
 		public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
 			// TODO: IMPLEMENT THIS
-			
-			/**
-			 * NO IDEA IF THIS IS ABSOLUTE SHITE
-			 * WILL HAVE TO DEBUG LATER
-			 * LOOKS LIKE SHITE
-			 */
-			
+						
 			boolean revised = false;
+			VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
 			
-			for(String x : assignment.get(i)) {
-				boolean extension_found = false;
-				for(String y : assignment.get(j)) {
-					for(Pair<String> value : this.constraints.get(i).get(j)) {
-						if(value.x.equals(x) && value.y.equals(y)) {
-							extension_found = true;
-							break;
-						}
-					}
+			
+			for(String x : assignment.get(i)) {		
+				boolean y_satisfy = false;
+				for(String y : assignment.get(j)) {	
 					
-					if(!extension_found) {
-						assignment.remove(i);
-						revised = true;
-					}				
+					for(Pair<String> pair : constraints.get(i).get(j)) {						
+						if(pair.x.equals(x) && pair.y.equals(y)) {		
+							y_satisfy = true;						
+						}
+						
+					}
+									
+				}
+				
+				if(!y_satisfy) {
+					copy.get(i).remove(x);
+					revised = true;
 				}
 			}
 			
+			assignment = copy;
+			
 			return revised;
-		}
+		} 
 		
 		@SuppressWarnings("unchecked")
 		private VariablesToDomainsMapping deepCopyAssignment(VariablesToDomainsMapping assignment) {
