@@ -17,8 +17,6 @@ public class Assignment5 {
 		CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
 		//printSudokuSolution(csp.domains);
 		ArrayList<String> test = new ArrayList<>();
-		test.add("1-0");
-		csp.inference(csp.domains, test);
 		
 		
 		
@@ -108,8 +106,6 @@ public class Assignment5 {
 				
 				Pair<String> pair = queue.get(0);
 				queue.remove(0);
-				System.out.println(pair.x);
-				System.out.println(assignment.get(pair.x));
 				
 				if(revise(assignment, pair.x, pair.y)) {
 					if(assignment.get(pair.x).size() == 0) {
@@ -118,11 +114,7 @@ public class Assignment5 {
 					
 					
 				}
-				
-				
-				
-				
-				
+								
 			}
 			
 			return true;
@@ -139,8 +131,6 @@ public class Assignment5 {
 		 */
 		public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
 			// TODO: IMPLEMENT THIS
-			
-			// THIS WORKS BABY YEAH!
 						
 			boolean revised = false;
 			VariablesToDomainsMapping copy = deepCopyAssignment(assignment);			
