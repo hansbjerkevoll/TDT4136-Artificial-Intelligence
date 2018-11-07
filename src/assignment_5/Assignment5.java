@@ -9,6 +9,7 @@ import java.util.Scanner;
 import java.util.Map;
 
 public class Assignment5 {
+
     public static void main(String[] args) {
         CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
         printSudokuSolution(csp.domains);
@@ -58,6 +59,8 @@ public class Assignment5 {
         ArrayList<String> variables;
         VariablesToDomainsMapping domains;
         HashMap<String, HashMap<String, ArrayList<Pair<String>>>> constraints;
+
+        VariablesToDomainsMapping assignment_global, assignment_final;
 
         public CSP() {
             // this.variables is a list of the variable names in the CSP
@@ -208,6 +211,7 @@ public class Assignment5 {
             System.out.println("Da er vi inne i backtrack og klar til å starte");
             String pairkey = (selectUnassignedVariable(assignment));
 
+            
 
         /*
         find out if there are unassigned cells. if not: return true
@@ -245,7 +249,32 @@ public class Assignment5 {
          */
         public boolean inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
             // TODO: IMPLEMENT THIS
-            return false;
+            while(!queue.isEmpty()) {
+
+
+                Pair<String> pair = queue.get(0);
+                queue.remove(0);
+
+                if(revise(assignment, pair.x, pair.y)) {
+                    assignment = assignment_global;
+                    if(assignment.get(pair.x).size() == 0) {
+                        return false;
+                    }
+
+                    for(Pair<String> neighbour : getAllNeighboringArcs(pair.x)) {
+                        if(neighbour.x == pair.y) {
+                            continue;
+                        }
+                        queue.add(neighbour);
+                    }
+
+                }
+
+            }
+
+            assignment_final = assignment;
+
+            return true;
         }
 
         /**
@@ -258,8 +287,28 @@ public class Assignment5 {
          * 'assignment'.
          */
         public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
-            // TODO: IMPLEMENT THIS
-            return false;
+            boolean revised = false;
+            VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
+
+            for(String x : assignment.get(i)) {
+                boolean y_satisfy = false;
+                for(String y : assignment.get(j)) {
+                    for(Pair<String> pair : constraints.get(i).get(j)) {
+                        if(pair.x.equals(x) && pair.y.equals(y)) {
+                            y_satisfy = true;
+                        }
+                    }
+                }
+
+                if(!y_satisfy) {
+                    copy.get(i).remove(x);
+                    revised = true;
+                }
+            }
+
+            this.assignment_global = copy;
+
+            return revised;
         }
     }
 
@@ -379,3 +428,4 @@ public class Assignment5 {
         }
     }
 }
+
