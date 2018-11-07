@@ -17,25 +17,7 @@ public class Assignment5 {
 	public static void main(String[] args) throws IOException {
 	
 		CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
-		printSudokuSolution(csp.domains);
-		Pair<String> pair1 = csp.new Pair<String>("0-0", "1-0");
-		Pair<String> pair2 = csp.new Pair<String>("1-1", "0-0");
-		Pair<String> pair3 = csp.new Pair<String>("1-2", "0-0");
-		Pair<String> pair4 = csp.new Pair<String>("1-3", "0-0");
-		Pair<String> pair5 = csp.new Pair<String>("1-4", "0-0");
-		ArrayList<Pair<String>> queue = new ArrayList<>();
-		queue.add(pair1);
-//		queue.add(pair2);
-//		queue.add(pair3);
-//		queue.add(pair4);
-//		queue.add(pair5);
-		csp.inference(csp.domains, queue);
-		System.out.println(csp.assignment_final);
-		
-		
-		//System.out.println(csp.revise(csp.domains, "0-0", "1-0"));
-		//System.out.println(csp.constraints.get("0-2").get("1-0"));	
-		
+		printSudokuSolution(csp.backtrackingSearch());
 		
 	}
 
@@ -84,7 +66,13 @@ public class Assignment5 {
 		 */
 		public VariablesToDomainsMapping backtrack(VariablesToDomainsMapping assignment) {
 			// TODO: IMPLEMENT THIS
-			return assignment;
+			
+			String un_ass_var = selectUnassignedVariable(assignment);
+			if(un_ass_var == null) {
+				return assignment;
+			}
+			
+			return assignment_global;
 		}
 
 		/**
@@ -116,10 +104,9 @@ public class Assignment5 {
 			// TODO: IMPLEMENT THIS
 			while(!queue.isEmpty()) {
 				
+				
 				Pair<String> pair = queue.get(0);
 				queue.remove(0);
-				
-				VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
 				
 				if(revise(assignment, pair.x, pair.y)) {
 					assignment = assignment_global;
@@ -133,8 +120,7 @@ public class Assignment5 {
 						}
 						queue.add(neighbour);
 					}
-					
-					
+									
 				}
 								
 			}
@@ -155,7 +141,7 @@ public class Assignment5 {
 		 */
 		public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
 			// TODO: IMPLEMENT THIS
-					
+			
 			boolean revised = false;
 			VariablesToDomainsMapping copy = deepCopyAssignment(assignment);			
 			
@@ -251,7 +237,7 @@ public class Assignment5 {
 		public ArrayList<Pair<String>> getAllNeighboringArcs(String var) {
 			ArrayList<Pair<String>> arcs = new ArrayList<Pair<String>>();
 			for (String i : this.constraints.get(var).keySet()) {
-				arcs.add(new Pair<String>(i, var));
+				arcs.add(new Pair<String>(var, i));
 			}
 			return arcs;
 		}
