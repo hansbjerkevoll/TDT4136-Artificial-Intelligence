@@ -15,13 +15,11 @@ public class Assignment5 {
 	public static void main(String[] args) throws IOException {
 	
 		CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
-		printSudokuSolution(csp.domains);
+		//printSudokuSolution(csp.domains);
+		ArrayList<String> test = new ArrayList<>();
+		test.add("1-0");
+		csp.inference(csp.domains, test);
 		
-		System.out.println(csp.revise(csp.domains, "0-0", "1-0"));
-		
-		for(String x : csp.domains.get("0-0")) {
-			System.out.println(x);
-		}
 		
 		
 		
@@ -105,6 +103,28 @@ public class Assignment5 {
 		public boolean inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
 			
 			// TODO: IMPLEMENT THIS
+			System.out.println(queue);
+			while(!queue.isEmpty()) {
+				
+				Pair<String> pair = queue.get(0);
+				queue.remove(0);
+				System.out.println(pair.x);
+				System.out.println(assignment.get(pair.x));
+				
+				if(revise(assignment, pair.x, pair.y)) {
+					if(assignment.get(pair.x).size() == 0) {
+						return false;
+					}
+					
+					
+				}
+				
+				
+				
+				
+				
+			}
+			
 			return true;
 		}
 
@@ -119,10 +139,11 @@ public class Assignment5 {
 		 */
 		public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
 			// TODO: IMPLEMENT THIS
+			
+			// THIS WORKS BABY YEAH!
 						
 			boolean revised = false;
-			VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
-			
+			VariablesToDomainsMapping copy = deepCopyAssignment(assignment);			
 			
 			for(String x : assignment.get(i)) {		
 				boolean y_satisfy = false;
@@ -131,10 +152,8 @@ public class Assignment5 {
 					for(Pair<String> pair : constraints.get(i).get(j)) {						
 						if(pair.x.equals(x) && pair.y.equals(y)) {		
 							y_satisfy = true;						
-						}
-						
-					}
-									
+						}			
+					}									
 				}
 				
 				if(!y_satisfy) {
@@ -144,6 +163,8 @@ public class Assignment5 {
 			}
 			
 			assignment = copy;
+			
+			System.out.println(assignment.get(i));
 			
 			return revised;
 		} 
