@@ -211,11 +211,10 @@ public class Assignment5 {
             System.out.println("Da er vi inne i backtrack og klar til å starte");
             String pairkey = (selectUnassignedVariable(assignment));
 
-            
+
 
         /*
         find out if there are unassigned cells. if not: return true
-
         for digits 1-9 if there is no conflict for digit at row, column then assign digit to row, column and recursively try to fill the rest of the grid
         if recursion is successful, we return true
                 else we remove the digit and try another digits
@@ -428,4 +427,3 @@ public class Assignment5 {
         }
     }
 }
-
