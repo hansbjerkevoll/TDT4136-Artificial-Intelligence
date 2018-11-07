@@ -11,57 +11,18 @@ import java.util.Map;
 public class Assignment5 {
 
     public static void main(String[] args) {
-        CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
-        printSudokuSolution(csp.domains);
-        csp.backtrackingSearch();
-    }
-
-
-    public static interface ValuePairFilter {
-        public boolean filter(String x, String y);
-    }
-
-    public static class DifferentValuesFilter implements ValuePairFilter {
-        @Override
-        public boolean filter(String x, String y) {
-            return !x.equals(y);
-        }
-    }
-
-    @SuppressWarnings("serial")
-    public static class VariablesToDomainsMapping extends HashMap<String, ArrayList<String>> {
+        CSP csp = createSudokuCSP("src/assignment_5/sudoku/medium.txt");
+        printSudokuSolution(csp.backtrackingSearch());
     }
 
     public static class CSP {
-        @SuppressWarnings("unchecked")
-        private VariablesToDomainsMapping deepCopyAssignment(VariablesToDomainsMapping assignment) {
-            VariablesToDomainsMapping copy = new VariablesToDomainsMapping();
-            for (String key : assignment.keySet()) {
-                copy.put(key, (ArrayList<String>) assignment.get(key).clone());
-            }
-            return copy;
-        }
-
-        public class Pair<T> {
-            public T x, y;
-
-            public Pair(T x, T y) {
-                this.x = x;
-                this.y = y;
-            }
-
-            @Override
-            public String toString() {
-                return "(" + this.x + "," + this.y + ")";
-            }
-        }
-
+       
         ArrayList<String> variables;
         VariablesToDomainsMapping domains;
         HashMap<String, HashMap<String, ArrayList<Pair<String>>>> constraints;
 
-        VariablesToDomainsMapping assignment_global, assignment_final;
-
+        VariablesToDomainsMapping assignment_global;
+        
         public CSP() {
             // this.variables is a list of the variable names in the CSP
             this.variables = new ArrayList<String>();
@@ -73,7 +34,152 @@ public class Assignment5 {
             // the variable pair (i, j)
             this.constraints = new HashMap<String, HashMap<String, ArrayList<Pair<String>>>>();
         }
+        
+        /**
+         * This functions starts the CSP solver and returns the found solution.
+         */
+        public VariablesToDomainsMapping backtrackingSearch() {
+            // Make a so-called "deep copy" of the dictionary containing the
+            // domains of the CSP variables. The deep copy is required to
+            // ensure that any changes made to 'assignment' does not have any
+            // side effects elsewhere.
+            VariablesToDomainsMapping assignment = this.deepCopyAssignment(this.domains);
 
+            // Run AC-3 on all constraints in the CSP, to weed out all of the
+            // values that are not arc-consistent to begin with
+            this.inference(assignment, this.getAllArcs());
+
+            // Call backtrack with the partial assignment 'assignment'
+            return this.backtrack(assignment);
+        }
+
+        /**
+         * The function 'Backtrack' from the pseudocode in the textbook.
+         *
+         * The function is called recursively, with a partial assignment of
+         * values 'assignment'. 'assignment' is a dictionary that contains a
+         * list of all legal values for the variables that have *not* yet been
+         * decided, and a list of only a single value for the variables that
+         * *have* been decided.
+         *
+         * When all of the variables in 'assignment' have lists of length one,
+         * i.e. when all variables have been assigned a value, the function
+         * should return 'assignment'. Otherwise, the search should continue.
+         * When the function 'inference' is called to run the AC-3 algorithm,
+         * the lists of legal values in 'assignment' should get reduced as AC-3
+         * discovers illegal values.
+         *
+         * IMPORTANT: For every iteration of the for-loop in the pseudocode, you
+         * need to make a deep copy of 'assignment' into a new variable before
+         * changing it. Every iteration of the for-loop should have a clean
+         * slate and not see any traces of the old assignments and inferences
+         * that took place in previous iterations of the loop.
+         */
+        public VariablesToDomainsMapping backtrack(VariablesToDomainsMapping assignment) {
+            // TODO: IMPLEMENT THIS
+            String pairkey = (selectUnassignedVariable(assignment));
+
+            
+
+        /*
+        find out if there are unassigned cells. if not: return true
+        for digits 1-9 if there is no conflict for digit at row, column then assign digit to row, column and recursively try to fill the rest of the grid
+        if recursion is successful, we return true
+                else we remove the digit and try another digits
+        if all digits have been tried and nothing worked we return false
+    */
+            System.out.println(assignment_global);
+            return assignment_global;
+        }
+
+        /**
+         * The function 'Select-Unassigned-Variable' from the pseudocode in the
+         * textbook. Should return the name of one of the variables in
+         * 'assignment' that have not yet been decided, i.e. whose list of legal
+         * values has a length greater than one.
+         */
+        public String selectUnassignedVariable(VariablesToDomainsMapping assignment) {
+            // TODO: IMPLEMENT THIS
+            Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
+            while(it.hasNext()) {
+                Map.Entry<String, ArrayList<String>> pair = it.next();
+                if(pair.getValue().size() > 1) return pair.getKey();
+            }
+            return null;
+        }
+
+        /**
+         * The function 'AC-3' from the pseudocode in the textbook. 'assignment'
+         * is the current partial assignment, that contains the lists of legal
+         * values for each undecided variable. 'queue' is the initial queue of
+         * arcs that should be visited.
+         */
+        public boolean inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
+            // TODO: IMPLEMENT THIS
+            while(!queue.isEmpty()) {
+
+
+                Pair<String> pair = queue.get(0);
+                queue.remove(0);
+
+                if(revise(assignment, pair.x, pair.y)) {
+                    assignment = assignment_global;
+                    if(assignment.get(pair.x).size() == 0) {
+                        return false;
+                    }
+
+                    for(Pair<String> neighbour : getAllNeighboringArcs(pair.x)) {
+                        if(neighbour.x == pair.y) {
+                            continue;
+                        }
+                        queue.add(neighbour);
+                    }
+
+                }
+
+            }
+
+            assignment_global = assignment;
+            System.out.println(assignment_global);
+
+            return true;
+        }
+
+        /**
+         * The function 'Revise' from the pseudocode in the textbook.
+         * 'assignment' is the current partial assignment, that contains the
+         * lists of legal values for each undecided variable. 'i' and 'j'
+         * specifies the arc that should be visited. If a value is found in
+         * variable i's domain that doesn't satisfy the constraint between i and
+         * j, the value should be deleted from i's list of legal values in
+         * 'assignment'.
+         */
+        public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
+            boolean revised = false;
+            VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
+
+            for(String x : assignment.get(i)) {
+                boolean y_satisfy = false;
+                for(String y : assignment.get(j)) {
+                    for(Pair<String> pair : constraints.get(i).get(j)) {
+                        if(pair.x.equals(x) && pair.y.equals(y)) {
+                            y_satisfy = true;
+                        }
+                    }
+                }
+
+                if(!y_satisfy) {
+                    copy.get(i).remove(x);
+                    revised = true;
+                }
+            }
+
+            this.assignment_global = copy;
+
+            return revised;
+        }
+    
+       
         /**
          * Add a new variable to the CSP. 'name' is the variable name and
          * 'domain' is a list of the legal values for the variable.
@@ -163,152 +269,31 @@ public class Assignment5 {
                 }
             }
         }
-
-        /**
-         * This functions starts the CSP solver and returns the found solution.
-         */
-        public VariablesToDomainsMapping backtrackingSearch() {
-            System.out.println("Vi skal nå starte backtrackingSearch");
-            // Make a so-called "deep copy" of the dictionary containing the
-            // domains of the CSP variables. The deep copy is required to
-            // ensure that any changes made to 'assignment' does not have any
-            // side effects elsewhere.
-            VariablesToDomainsMapping assignment = this.deepCopyAssignment(this.domains);
-
-            // Run AC-3 on all constraints in the CSP, to weed out all of the
-            // values that are not arc-consistent to begin with
-            this.inference(assignment, this.getAllArcs());
-
-            // Call backtrack with the partial assignment 'assignment'
-            System.out.println("Nå skal vi returnere this.backtrack(assignment");
-            return this.backtrack(assignment);
-        }
-
-        /**
-         * The function 'Backtrack' from the pseudocode in the textbook.
-         *
-         * The function is called recursively, with a partial assignment of
-         * values 'assignment'. 'assignment' is a dictionary that contains a
-         * list of all legal values for the variables that have *not* yet been
-         * decided, and a list of only a single value for the variables that
-         * *have* been decided.
-         *
-         * When all of the variables in 'assignment' have lists of length one,
-         * i.e. when all variables have been assigned a value, the function
-         * should return 'assignment'. Otherwise, the search should continue.
-         * When the function 'inference' is called to run the AC-3 algorithm,
-         * the lists of legal values in 'assignment' should get reduced as AC-3
-         * discovers illegal values.
-         *
-         * IMPORTANT: For every iteration of the for-loop in the pseudocode, you
-         * need to make a deep copy of 'assignment' into a new variable before
-         * changing it. Every iteration of the for-loop should have a clean
-         * slate and not see any traces of the old assignments and inferences
-         * that took place in previous iterations of the loop.
-         */
-        public VariablesToDomainsMapping backtrack(VariablesToDomainsMapping assignment) {
-            // TODO: IMPLEMENT THIS
-            System.out.println("Da er vi inne i backtrack og klar til å starte");
-            String pairkey = (selectUnassignedVariable(assignment));
-
-            
-
-        /*
-        find out if there are unassigned cells. if not: return true
-        for digits 1-9 if there is no conflict for digit at row, column then assign digit to row, column and recursively try to fill the rest of the grid
-        if recursion is successful, we return true
-                else we remove the digit and try another digits
-        if all digits have been tried and nothing worked we return false
-    */
-
-            return assignment;
-        }
-
-        /**
-         * The function 'Select-Unassigned-Variable' from the pseudocode in the
-         * textbook. Should return the name of one of the variables in
-         * 'assignment' that have not yet been decided, i.e. whose list of legal
-         * values has a length greater than one.
-         */
-        public String selectUnassignedVariable(VariablesToDomainsMapping assignment) {
-            // TODO: IMPLEMENT THIS
-            Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
-            while(it.hasNext()) {
-                Map.Entry<String, ArrayList<String>> pair = it.next();
-                if(pair.getValue().size() > 1) return pair.getKey();
+     
+    
+        @SuppressWarnings("unchecked")
+        private VariablesToDomainsMapping deepCopyAssignment(VariablesToDomainsMapping assignment) {
+            VariablesToDomainsMapping copy = new VariablesToDomainsMapping();
+            for (String key : assignment.keySet()) {
+                copy.put(key, (ArrayList<String>) assignment.get(key).clone());
             }
-            return null;
+            return copy;
         }
 
-        /**
-         * The function 'AC-3' from the pseudocode in the textbook. 'assignment'
-         * is the current partial assignment, that contains the lists of legal
-         * values for each undecided variable. 'queue' is the initial queue of
-         * arcs that should be visited.
-         */
-        public boolean inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
-            // TODO: IMPLEMENT THIS
-            while(!queue.isEmpty()) {
+        public class Pair<T> {
+            public T x, y;
 
-
-                Pair<String> pair = queue.get(0);
-                queue.remove(0);
-
-                if(revise(assignment, pair.x, pair.y)) {
-                    assignment = assignment_global;
-                    if(assignment.get(pair.x).size() == 0) {
-                        return false;
-                    }
-
-                    for(Pair<String> neighbour : getAllNeighboringArcs(pair.x)) {
-                        if(neighbour.x == pair.y) {
-                            continue;
-                        }
-                        queue.add(neighbour);
-                    }
-
-                }
-
+            public Pair(T x, T y) {
+                this.x = x;
+                this.y = y;
             }
 
-            assignment_final = assignment;
-
-            return true;
-        }
-
-        /**
-         * The function 'Revise' from the pseudocode in the textbook.
-         * 'assignment' is the current partial assignment, that contains the
-         * lists of legal values for each undecided variable. 'i' and 'j'
-         * specifies the arc that should be visited. If a value is found in
-         * variable i's domain that doesn't satisfy the constraint between i and
-         * j, the value should be deleted from i's list of legal values in
-         * 'assignment'.
-         */
-        public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
-            boolean revised = false;
-            VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
-
-            for(String x : assignment.get(i)) {
-                boolean y_satisfy = false;
-                for(String y : assignment.get(j)) {
-                    for(Pair<String> pair : constraints.get(i).get(j)) {
-                        if(pair.x.equals(x) && pair.y.equals(y)) {
-                            y_satisfy = true;
-                        }
-                    }
-                }
-
-                if(!y_satisfy) {
-                    copy.get(i).remove(x);
-                    revised = true;
-                }
+            @Override
+            public String toString() {
+                return "(" + this.x + "," + this.y + ")";
             }
-
-            this.assignment_global = copy;
-
-            return revised;
         }
+    
     }
 
     /**
@@ -426,4 +411,22 @@ public class Assignment5 {
             }
         }
     }
+
+
+    public static interface ValuePairFilter {
+        public boolean filter(String x, String y);
+    }
+
+    public static class DifferentValuesFilter implements ValuePairFilter {
+        @Override
+        public boolean filter(String x, String y) {
+            return !x.equals(y);
+        }
+    }
+
+    @SuppressWarnings("serial")
+    public static class VariablesToDomainsMapping extends HashMap<String, ArrayList<String>> {
+    }
+
+
 }
