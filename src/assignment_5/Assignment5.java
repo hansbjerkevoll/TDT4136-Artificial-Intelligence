@@ -10,15 +10,27 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 
+import assignment_5.Assignment5.CSP.Pair;
+
 public class Assignment5 {
 	
 	public static void main(String[] args) throws IOException {
 	
 		CSP csp = createSudokuCSP("src/assignment_5/sudoku/easy.txt");
 		printSudokuSolution(csp.domains);
-		System.out.println(csp.getAllNeighboringArcs("1-1"));
-		
-		
+		Pair<String> pair1 = csp.new Pair<String>("0-0", "1-0");
+		Pair<String> pair2 = csp.new Pair<String>("1-1", "0-0");
+		Pair<String> pair3 = csp.new Pair<String>("1-2", "0-0");
+		Pair<String> pair4 = csp.new Pair<String>("1-3", "0-0");
+		Pair<String> pair5 = csp.new Pair<String>("1-4", "0-0");
+		ArrayList<Pair<String>> queue = new ArrayList<>();
+		queue.add(pair1);
+//		queue.add(pair2);
+//		queue.add(pair3);
+//		queue.add(pair4);
+//		queue.add(pair5);
+		csp.inference(csp.domains, queue);
+		System.out.println(csp.assignment_final);
 		
 		
 		//System.out.println(csp.revise(csp.domains, "0-0", "1-0"));
@@ -32,6 +44,8 @@ public class Assignment5 {
 		ArrayList<String> variables;
 		VariablesToDomainsMapping domains;
 		HashMap<String, HashMap<String, ArrayList<Pair<String>>>> constraints;
+		
+		VariablesToDomainsMapping assignment_global, assignment_final;
 
 		public CSP() {
 			// this.variables is a list of the variable names in the CSP
@@ -105,7 +119,10 @@ public class Assignment5 {
 				Pair<String> pair = queue.get(0);
 				queue.remove(0);
 				
+				VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
+				
 				if(revise(assignment, pair.x, pair.y)) {
+					assignment = assignment_global;
 					if(assignment.get(pair.x).size() == 0) {
 						return false;
 					}
@@ -114,7 +131,6 @@ public class Assignment5 {
 						if(neighbour.x == pair.y) {
 							continue;
 						}
-						
 						queue.add(neighbour);
 					}
 					
@@ -122,6 +138,8 @@ public class Assignment5 {
 				}
 								
 			}
+			
+			assignment_final = assignment;
 			
 			return true;
 		}
@@ -137,15 +155,14 @@ public class Assignment5 {
 		 */
 		public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
 			// TODO: IMPLEMENT THIS
-						
+					
 			boolean revised = false;
 			VariablesToDomainsMapping copy = deepCopyAssignment(assignment);			
 			
 			for(String x : assignment.get(i)) {		
 				boolean y_satisfy = false;
 				for(String y : assignment.get(j)) {	
-					
-					for(Pair<String> pair : constraints.get(i).get(j)) {						
+					for(Pair<String> pair : constraints.get(i).get(j)) {
 						if(pair.x.equals(x) && pair.y.equals(y)) {		
 							y_satisfy = true;						
 						}			
@@ -158,9 +175,7 @@ public class Assignment5 {
 				}
 			}
 			
-			assignment = copy;
-			
-			System.out.println(assignment.get(i));
+			this.assignment_global = copy;
 			
 			return revised;
 		} 
