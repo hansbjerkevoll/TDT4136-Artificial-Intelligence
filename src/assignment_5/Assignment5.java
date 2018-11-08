@@ -3,6 +3,7 @@ package assignment_5;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -50,7 +51,9 @@ public class Assignment5 {
             this.inference(assignment, this.getAllArcs());
 
             // Call backtrack with the partial assignment 'assignment'
-            return this.backtrack(assignment);
+            VariablesToDomainsMapping solution = this.backtrack(assignment_global);
+            check_solution(solution);
+            return solution;
         }
 
         /**
@@ -77,8 +80,34 @@ public class Assignment5 {
          */
         public VariablesToDomainsMapping backtrack(VariablesToDomainsMapping assignment) {
             // TODO: IMPLEMENT THIS
-            String pairkey = (selectUnassignedVariable(assignment));
-
+            String u_var = selectUnassignedVariable(assignment);
+            if(u_var == null) {
+            	return assignment;
+            }
+            
+            for(String value : assignment.get(u_var)) {
+            	
+            	VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
+            	ArrayList<String> value_list = new ArrayList<>();
+            	value_list.add(value);
+            	copy.put(u_var, value_list);
+            	
+            	boolean inferences = inference(copy, this.getAllArcs()); 
+            	if(!inferences) {
+            		
+            	}
+            	
+            	VariablesToDomainsMapping result = backtrack(assignment);
+            	if(!isFailure(result)) {
+            		return result;
+            	}
+            	
+            	
+            	assignment.get(u_var).remove(value);
+            	
+            }
+            
+            
             
 
         /*
@@ -88,8 +117,7 @@ public class Assignment5 {
                 else we remove the digit and try another digits
         if all digits have been tried and nothing worked we return false
     */
-            System.out.println(assignment_global);
-            return assignment_global;
+            return assignment;
         }
 
         /**
@@ -140,7 +168,6 @@ public class Assignment5 {
             }
 
             assignment_global = assignment;
-            System.out.println(assignment_global);
 
             return true;
         }
@@ -177,6 +204,44 @@ public class Assignment5 {
             this.assignment_global = copy;
 
             return revised;
+        }
+        
+        
+        /**
+         * 
+         * SOME HELP FUNCTIONS
+         */
+        
+        public boolean check_solution(VariablesToDomainsMapping assignment) {
+        	
+        	boolean correct = true;
+        	
+        	Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
+            while(it.hasNext()) {
+                Map.Entry<String, ArrayList<String>> pair = it.next();
+                if(pair.getValue().size() > 1 || pair.getValue().size() == 0) {
+                	System.out.println(pair);
+                	correct = false;
+                }
+            }
+            System.out.println(correct);
+        	
+        	return correct;
+        }
+        
+        public boolean isFailure(VariablesToDomainsMapping assignment) {
+        	
+        	boolean failure = false;
+        	
+        	Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
+            while(it.hasNext()) {
+                Map.Entry<String, ArrayList<String>> pair = it.next();
+                if(pair.getValue().size() == 0) {
+                	failure = true;
+                }
+            }
+        	
+        	return failure;
         }
     
        
