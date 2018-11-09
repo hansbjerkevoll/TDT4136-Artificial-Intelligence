@@ -8,6 +8,10 @@ import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Map;
 
+
+/**
+ * @author Helle van den Broek & Hans Bjerkevoll
+ */
 public class Assignment5 {
 
     public static void main(String[] args) {
@@ -85,45 +89,40 @@ public class Assignment5 {
          * slate and not see any traces of the old assignments and inferences
          * that took place in previous iterations of the loop.
          */
+
         public VariablesToDomainsMapping backtrack(VariablesToDomainsMapping assignment) {
-            // TODO: IMPLEMENT THIS
-        	
-        	/*
-            find out if there are unassigned cells. if not: return true
-            for digits 1-9 if there is no conflict for digit at row, column then assign digit to row, column and recursively try to fill the rest of the grid
-            if recursion is successful, we return true
-                    else we remove the digit and try another digits
-            if all digits have been tried and nothing worked we return false
+        	/**
+        	This function:
+            * Finds out if there are unassigned cells by calling selectUnassignedVariable
+            * It returns a string containing an unassigned variable. If it returns null, there are no unassigned variables
+            * For digits 1-9 if there is no conflict for digit, recurcivly try and solve grid
+            * If recursion is successful, we return result
+            * Else we remove the digit and try another digit
+            * If all digits have been tried and nothing worked we return the assignment
+            * We update backtrack_fail
             */
         	
         	backtrack_call++;
-        	
             String u_var = selectUnassignedVariable(assignment);
             if(u_var == null) {
             	return assignment;
             }
                	            
             for(String value : assignment.get(u_var)) {
-            	
             	VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
-            	
             	ArrayList<String> value_list = new ArrayList<>();
             	value_list.add(value);
             	copy.put(u_var, value_list);
-            	
-            	VariablesToDomainsMapping inferences = inference(copy, this.getAllArcs()); 
+            	VariablesToDomainsMapping inferences = inference(copy, this.getAllArcs());
             	if(!isFailure(inferences)) {
             		VariablesToDomainsMapping result = backtrack(inferences);
                 	if(!isFailure(result)) {
                 		return result;
                 	}
-            	}            	         	
-            	     
+            	}
             	copy.get(u_var).remove(value);
             	assignment = copy;
-            	
-            }                 
-
+            }
         	backtrack_fail++;
             return assignment;
         }
@@ -135,7 +134,6 @@ public class Assignment5 {
          * values has a length greater than one.
          */
         public String selectUnassignedVariable(VariablesToDomainsMapping assignment) {
-            // TODO: IMPLEMENT THIS
             Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
             while(it.hasNext()) {
                 Map.Entry<String, ArrayList<String>> pair = it.next();
@@ -151,20 +149,21 @@ public class Assignment5 {
          * arcs that should be visited.
          */
         public VariablesToDomainsMapping inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
-            // TODO: IMPLEMENT THIS
-            while(!queue.isEmpty()) {
+            /**
+             * This function:
+             * Takes in a queue as a parameter
+             * Checks whether it is empty, if not: it removes all non-consistent values for every variable
+             */
 
+            while(!queue.isEmpty()) {
                 Pair<String> pair = queue.get(0);
                 queue.remove(0);
-                
                 VariablesToDomainsMapping revised = revise(assignment,pair.x, pair.y);
-                
                 if(!assignment.equals(revised)) {
                     assignment = revised;
                     if(assignment.get(pair.x).size() == 0) {
                         return assignment;
                     }
-
                     for(Pair<String> neighbour : getAllNeighboringArcs(pair.x)) {
                         if(neighbour.x == pair.y) {
                             continue;
@@ -187,9 +186,7 @@ public class Assignment5 {
          * 'assignment'.
          */
         public VariablesToDomainsMapping revise(VariablesToDomainsMapping assignment, String i, String j) {
-        	
             VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
-
             for(String x : assignment.get(i)) {
                 boolean y_satisfy = false;
                 for(String y : assignment.get(j)) {
@@ -199,41 +196,20 @@ public class Assignment5 {
                         }
                     }
                 }
-
                 if(!y_satisfy) {
                     copy.get(i).remove(x);
                 }
             }
-
             return copy;
         }
-        
-        
+
+
         /**
-         * SOME HELP FUNCTIONS
+         * This function checks whether any of the variables have no legal values.
+         * If that is the case: return true
          */
-        
-        public boolean check_solution(VariablesToDomainsMapping assignment) {
-        	
-        	boolean correct = true;
-        	
-        	Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
-            while(it.hasNext()) {
-                Map.Entry<String, ArrayList<String>> pair = it.next();
-                if(pair.getValue().size() > 1 || pair.getValue().size() == 0) {
-                	System.out.println(pair);
-                	correct = false;
-                }
-            }
-            System.out.println(correct);
-        	
-        	return correct;
-        }
-        
         public boolean isFailure(VariablesToDomainsMapping assignment) {
-        	
         	boolean failure = false;
-        	
         	Iterator<Map.Entry<String, ArrayList<String>>> it = assignment.entrySet().iterator();
             while(it.hasNext()) {
                 Map.Entry<String, ArrayList<String>> pair = it.next();
@@ -241,7 +217,6 @@ public class Assignment5 {
                 	failure = true;
                 }
             }
-        	
         	return failure;
         }
     
