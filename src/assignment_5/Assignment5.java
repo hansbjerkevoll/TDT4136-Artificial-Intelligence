@@ -11,9 +11,10 @@ import java.util.Map;
 public class Assignment5 {
 
     public static void main(String[] args) {
-    	String sudokuboard = "veryhard.txt";
+    	String sudokuboard = "easy.txt";
         CSP csp = createSudokuCSP("src/assignment_5/sudoku/" + sudokuboard);
         System.out.println("Solving " + sudokuboard);
+        printSudokuSolution(csp.domains);
         printSudokuSolution(csp.backtrackingSearch());
         System.out.println("Backtrack called: " + csp.backtrack_call);
         System.out.println("Backtrack failed: " + csp.backtrack_fail);
@@ -468,7 +469,12 @@ public class Assignment5 {
     public static void printSudokuSolution(VariablesToDomainsMapping assignment) {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
-                System.out.print(assignment.get(row + "-" + col).get(0) + " ");
+            	ArrayList<String> cell_values = assignment.get(row + "-" + col);
+                if(cell_values.size() == 1) {
+                	System.out.print(assignment.get(row + "-" + col).get(0) + " ");
+                } else {
+                	System.out.print(". ");
+                }
                 if (col == 2 || col == 5) {
                     System.out.print("| ");
                 }
