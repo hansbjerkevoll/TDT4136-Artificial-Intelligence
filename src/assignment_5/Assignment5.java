@@ -63,7 +63,6 @@ public class Assignment5 {
 
             // Call backtrack with the partial assignment 'assignment'
             VariablesToDomainsMapping solution = this.backtrack(assignment);
-            check_solution(solution);
             return solution;
         }
 
