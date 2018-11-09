@@ -11,7 +11,7 @@ import java.util.Map;
 public class Assignment5 {
 
     public static void main(String[] args) {
-    	String sudokuboard = "easy.txt";
+    	String sudokuboard = "veryhard.txt";
         CSP csp = createSudokuCSP("src/assignment_5/sudoku/" + sudokuboard);
         System.out.println("Solving " + sudokuboard);
         printSudokuSolution(csp.domains);
@@ -19,8 +19,6 @@ public class Assignment5 {
         System.out.println("Backtrack called: " + csp.backtrack_call);
         System.out.println("Backtrack failed: " + csp.backtrack_fail);
         
-        CSP map_csp = createMapColoringCSP();
-        System.out.println(map_csp.backtrackingSearch());
     }
 
     public static class CSP {
@@ -102,13 +100,11 @@ public class Assignment5 {
         	
             String u_var = selectUnassignedVariable(assignment);
             if(u_var == null) {
-            	backtrack_fail++;
             	return assignment;
             }
                	            
             for(String value : assignment.get(u_var)) {
             	
-
             	VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
             	
             	ArrayList<String> value_list = new ArrayList<>();
@@ -128,6 +124,7 @@ public class Assignment5 {
             	
             }                 
 
+        	backtrack_fail++;
             return assignment;
         }
 
