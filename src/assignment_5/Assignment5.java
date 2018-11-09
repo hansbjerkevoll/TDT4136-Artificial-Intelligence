@@ -3,7 +3,6 @@ package assignment_5;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -12,8 +11,15 @@ import java.util.Map;
 public class Assignment5 {
 
     public static void main(String[] args) {
-        CSP csp = createSudokuCSP("src/assignment_5/sudoku/medium.txt");
+    	String sudokuboard = "veryhard.txt";
+        CSP csp = createSudokuCSP("src/assignment_5/sudoku/" + sudokuboard);
+        System.out.println("Solving " + sudokuboard);
         printSudokuSolution(csp.backtrackingSearch());
+        System.out.println("Backtrack called: " + csp.backtrack_call);
+        System.out.println("Backtrack failed: " + csp.backtrack_fail);
+        
+        CSP map_csp = createMapColoringCSP();
+        System.out.println(map_csp.backtrackingSearch());
     }
 
     public static class CSP {
@@ -23,6 +29,8 @@ public class Assignment5 {
         HashMap<String, HashMap<String, ArrayList<Pair<String>>>> constraints;
 
         VariablesToDomainsMapping assignment_global;
+        int backtrack_call = 0;
+        int backtrack_fail = 0;
         
         public CSP() {
             // this.variables is a list of the variable names in the CSP
@@ -48,10 +56,10 @@ public class Assignment5 {
 
             // Run AC-3 on all constraints in the CSP, to weed out all of the
             // values that are not arc-consistent to begin with
-            this.inference(assignment, this.getAllArcs());
+            assignment = this.inference(assignment, this.getAllArcs());
 
             // Call backtrack with the partial assignment 'assignment'
-            VariablesToDomainsMapping solution = this.backtrack(assignment_global);
+            VariablesToDomainsMapping solution = this.backtrack(assignment);
             check_solution(solution);
             return solution;
         }
@@ -80,43 +88,45 @@ public class Assignment5 {
          */
         public VariablesToDomainsMapping backtrack(VariablesToDomainsMapping assignment) {
             // TODO: IMPLEMENT THIS
+        	
+        	/*
+            find out if there are unassigned cells. if not: return true
+            for digits 1-9 if there is no conflict for digit at row, column then assign digit to row, column and recursively try to fill the rest of the grid
+            if recursion is successful, we return true
+                    else we remove the digit and try another digits
+            if all digits have been tried and nothing worked we return false
+            */
+        	
+        	backtrack_call++;
+        	
             String u_var = selectUnassignedVariable(assignment);
             if(u_var == null) {
+            	backtrack_fail++;
             	return assignment;
             }
-            
+               	            
             for(String value : assignment.get(u_var)) {
             	
+
             	VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
+            	
             	ArrayList<String> value_list = new ArrayList<>();
             	value_list.add(value);
             	copy.put(u_var, value_list);
             	
-            	boolean inferences = inference(copy, this.getAllArcs()); 
-            	if(!inferences) {
-            		
-            	}
+            	VariablesToDomainsMapping inferences = inference(copy, this.getAllArcs()); 
+            	if(!isFailure(inferences)) {
+            		VariablesToDomainsMapping result = backtrack(inferences);
+                	if(!isFailure(result)) {
+                		return result;
+                	}
+            	}            	         	
+            	     
+            	copy.get(u_var).remove(value);
+            	assignment = copy;
             	
-            	VariablesToDomainsMapping result = backtrack(assignment);
-            	if(!isFailure(result)) {
-            		return result;
-            	}
-            	
-            	
-            	assignment.get(u_var).remove(value);
-            	
-            }
-            
-            
-            
+            }                 
 
-        /*
-        find out if there are unassigned cells. if not: return true
-        for digits 1-9 if there is no conflict for digit at row, column then assign digit to row, column and recursively try to fill the rest of the grid
-        if recursion is successful, we return true
-                else we remove the digit and try another digits
-        if all digits have been tried and nothing worked we return false
-    */
             return assignment;
         }
 
@@ -142,18 +152,19 @@ public class Assignment5 {
          * values for each undecided variable. 'queue' is the initial queue of
          * arcs that should be visited.
          */
-        public boolean inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
+        public VariablesToDomainsMapping inference(VariablesToDomainsMapping assignment, ArrayList<Pair<String>> queue) {
             // TODO: IMPLEMENT THIS
             while(!queue.isEmpty()) {
 
-
                 Pair<String> pair = queue.get(0);
                 queue.remove(0);
-
-                if(revise(assignment, pair.x, pair.y)) {
-                    assignment = assignment_global;
+                
+                VariablesToDomainsMapping revised = revise(assignment,pair.x, pair.y);
+                
+                if(!assignment.equals(revised)) {
+                    assignment = revised;
                     if(assignment.get(pair.x).size() == 0) {
-                        return false;
+                        return assignment;
                     }
 
                     for(Pair<String> neighbour : getAllNeighboringArcs(pair.x)) {
@@ -162,14 +173,10 @@ public class Assignment5 {
                         }
                         queue.add(neighbour);
                     }
-
                 }
-
             }
-
-            assignment_global = assignment;
-
-            return true;
+            
+            return assignment;
         }
 
         /**
@@ -181,8 +188,8 @@ public class Assignment5 {
          * j, the value should be deleted from i's list of legal values in
          * 'assignment'.
          */
-        public boolean revise(VariablesToDomainsMapping assignment, String i, String j) {
-            boolean revised = false;
+        public VariablesToDomainsMapping revise(VariablesToDomainsMapping assignment, String i, String j) {
+        	
             VariablesToDomainsMapping copy = deepCopyAssignment(assignment);
 
             for(String x : assignment.get(i)) {
@@ -197,18 +204,14 @@ public class Assignment5 {
 
                 if(!y_satisfy) {
                     copy.get(i).remove(x);
-                    revised = true;
                 }
             }
 
-            this.assignment_global = copy;
-
-            return revised;
+            return copy;
         }
         
         
         /**
-         * 
          * SOME HELP FUNCTIONS
          */
         
